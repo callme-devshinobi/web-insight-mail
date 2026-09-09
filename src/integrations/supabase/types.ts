@@ -14,7 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          email_template: string
+          from_email: string
+          from_name: string
+          id: boolean
+          reply_to: string
+          test_recipient: string
+          updated_at: string
+        }
+        Insert: {
+          email_template?: string
+          from_email?: string
+          from_name?: string
+          id?: boolean
+          reply_to?: string
+          test_recipient?: string
+          updated_at?: string
+        }
+        Update: {
+          email_template?: string
+          from_email?: string
+          from_name?: string
+          id?: boolean
+          reply_to?: string
+          test_recipient?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prospects: {
+        Row: {
+          body: string | null
+          checks: Json
+          company: string
+          created_at: string
+          email: string
+          email_status: string
+          id: string
+          scan_error: string | null
+          scan_status: string
+          selected_issue: string | null
+          send_error: string | null
+          sent_at: string | null
+          skip_reason: string | null
+          subject: string | null
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          body?: string | null
+          checks?: Json
+          company?: string
+          created_at?: string
+          email?: string
+          email_status?: string
+          id?: string
+          scan_error?: string | null
+          scan_status?: string
+          selected_issue?: string | null
+          send_error?: string | null
+          sent_at?: string | null
+          skip_reason?: string | null
+          subject?: string | null
+          updated_at?: string
+          website?: string
+        }
+        Update: {
+          body?: string | null
+          checks?: Json
+          company?: string
+          created_at?: string
+          email?: string
+          email_status?: string
+          id?: string
+          scan_error?: string | null
+          scan_status?: string
+          selected_issue?: string | null
+          send_error?: string | null
+          sent_at?: string | null
+          skip_reason?: string | null
+          subject?: string | null
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
