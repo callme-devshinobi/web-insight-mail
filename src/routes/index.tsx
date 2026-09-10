@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: UploadScanPage;
+  component: UploadScanPage,
 });
 
 type Mapping = { company: string; email: string; website: string };
