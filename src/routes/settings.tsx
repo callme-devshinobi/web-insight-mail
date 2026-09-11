@@ -34,13 +34,7 @@ export const Route = createFileRoute("/settings")({
   component: SettingsPage,
 });
 
-const EMPTY: Settings = {
-  from_name: "",
-  from_email: "",
-  reply_to: "",
-  email_template: "",
-  test_recipient: "",
-};
+const EMPTY: Settings = EMPTY_SETTINGS;
 
 function Field({
   label,
