@@ -28,18 +28,33 @@ type SettingsRow = {
   from_email: string;
   reply_to: string;
   email_template: string;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_secure: boolean;
+  smtp_username: string;
+};
+
+const EMPTY_SETTINGS: SettingsRow = {
+  from_name: "",
+  from_email: "",
+  reply_to: "",
+  email_template: "",
+  smtp_host: "",
+  smtp_port: 465,
+  smtp_secure: true,
+  smtp_username: "",
 };
 
 async function loadSettings(client: ReturnType<typeof db>): Promise<SettingsRow> {
   const { data, error } = await client
     .from("app_settings")
-    .select("from_name, from_email, reply_to, email_template")
+    .select(
+      "from_name, from_email, reply_to, email_template, smtp_host, smtp_port, smtp_secure, smtp_username",
+    )
     .eq("id", true)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return (
-    data ?? { from_name: "", from_email: "", reply_to: "", email_template: "" }
-  );
+  return (data as SettingsRow | null) ?? EMPTY_SETTINGS;
 }
 
 function senderOf(settings: SettingsRow): Sender {
@@ -47,6 +62,10 @@ function senderOf(settings: SettingsRow): Sender {
     fromName: settings.from_name,
     fromEmail: settings.from_email,
     replyTo: settings.reply_to,
+    smtpHost: settings.smtp_host,
+    smtpPort: settings.smtp_port,
+    smtpSecure: settings.smtp_secure,
+    smtpUsername: settings.smtp_username,
   };
 }
 
