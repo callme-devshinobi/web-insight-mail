@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AppShell, SectionTitle } from "@/components/AppShell";
 import {
   DEFAULT_TEMPLATE,
+  EMPTY_SETTINGS,
   fetchSettings,
   saveSettings,
   type Settings,
@@ -34,13 +35,7 @@ export const Route = createFileRoute("/settings")({
   component: SettingsPage,
 });
 
-const EMPTY: Settings = {
-  from_name: "",
-  from_email: "",
-  reply_to: "",
-  email_template: "",
-  test_recipient: "",
-};
+const EMPTY: Settings = EMPTY_SETTINGS;
 
 function Field({
   label,

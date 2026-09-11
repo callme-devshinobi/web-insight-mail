@@ -26,6 +26,22 @@ export type Settings = {
   reply_to: string;
   email_template: string;
   test_recipient: string;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_secure: boolean;
+  smtp_username: string;
+};
+
+export const EMPTY_SETTINGS: Settings = {
+  from_name: "",
+  from_email: "",
+  reply_to: "",
+  email_template: "",
+  test_recipient: "",
+  smtp_host: "",
+  smtp_port: 465,
+  smtp_secure: true,
+  smtp_username: "",
 };
 
 export const DEFAULT_TEMPLATE = `Subject: keep it lowercase, specific and under 60 characters.
@@ -52,19 +68,13 @@ export async function fetchProspects(): Promise<Prospect[]> {
 export async function fetchSettings(): Promise<Settings> {
   const { data, error } = await supabase
     .from("app_settings")
-    .select("from_name, from_email, reply_to, email_template, test_recipient")
+    .select(
+      "from_name, from_email, reply_to, email_template, test_recipient, smtp_host, smtp_port, smtp_secure, smtp_username",
+    )
     .eq("id", true)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return (
-    (data as Settings | null) ?? {
-      from_name: "",
-      from_email: "",
-      reply_to: "",
-      email_template: "",
-      test_recipient: "",
-    }
-  );
+  return (data as Settings | null) ?? EMPTY_SETTINGS;
 }
 
 export async function saveSettings(values: Settings) {
