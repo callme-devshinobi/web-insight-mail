@@ -1,7 +1,13 @@
+import { smtpSend } from "./smtp.server";
+
 export type Sender = {
   fromName: string;
   fromEmail: string;
   replyTo: string;
+  smtpHost: string;
+  smtpPort: number;
+  smtpSecure: boolean;
+  smtpUsername: string;
 };
 
 export function buildFooter(sender: Sender): string {
@@ -28,10 +34,10 @@ export async function sendMail(opts: {
   subject: string;
   text: string;
 }): Promise<void> {
-  const apiKey = process.env["RESEND_API_KEY"];
-  if (!apiKey) {
+  const password = process.env["SMTP_PASSWORD"];
+  if (!password) {
     throw new Error(
-      "No email API key is set up yet. Add your Resend API key before sending.",
+      "Your mailbox password isn't saved yet. Add it before sending.",
     );
   }
   if (!opts.sender.fromEmail) {
@@ -39,30 +45,21 @@ export async function sendMail(opts: {
   }
   if (!opts.to) throw new Error("This prospect has no email address.");
 
-  const from = opts.sender.fromName
-    ? `${opts.sender.fromName} <${opts.sender.fromEmail}>`
-    : opts.sender.fromEmail;
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+  await smtpSend(
+    {
+      host: opts.sender.smtpHost,
+      port: opts.sender.smtpPort || 465,
+      secure: opts.sender.smtpSecure,
+      username: opts.sender.smtpUsername || opts.sender.fromEmail,
+      password,
     },
-    body: JSON.stringify({
-      from,
-      to: [opts.to],
+    {
+      fromName: opts.sender.fromName,
+      fromEmail: opts.sender.fromEmail,
+      replyTo: opts.sender.replyTo,
+      to: opts.to,
       subject: opts.subject,
       text: opts.text,
-      ...(opts.sender.replyTo ? { reply_to: opts.sender.replyTo } : {}),
-      headers: {
-        "List-Unsubscribe": `<mailto:${opts.sender.replyTo || opts.sender.fromEmail}?subject=unsubscribe>`,
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Email service rejected the send (${res.status}): ${detail.slice(0, 300)}`);
-  }
+    },
+  );
 }
