@@ -20,7 +20,8 @@ async function cloudflareConn(
 ): Promise<Conn | null> {
   let mod: { connect: (a: unknown, o?: unknown) => unknown };
   try {
-    mod = (await import(/* @vite-ignore */ "cloudflare:sockets")) as never;
+    const spec = "cloudflare:sockets";
+    mod = (await import(/* @vite-ignore */ spec)) as never;
   } catch {
     return null;
   }
