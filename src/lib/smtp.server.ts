@@ -256,7 +256,7 @@ export async function smtpSend(config: SmtpConfig, msg: SmtpMessage): Promise<vo
       throw new Error(`Mail server refused the connection: ${greeting.text.trim()}`);
     }
 
-    const clientName = config.fromDomain ?? "prospectscan.local";
+    const clientName = msg.fromEmail.split("@")[1] || "prospectscan.local";
     let ehlo = await session.command(`EHLO ${clientName}`, [250], "Handshake");
 
     if (!config.secure) {
