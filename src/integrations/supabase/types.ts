@@ -21,6 +21,10 @@ export type Database = {
           from_name: string
           id: boolean
           reply_to: string
+          smtp_host: string
+          smtp_port: number
+          smtp_secure: boolean
+          smtp_username: string
           test_recipient: string
           updated_at: string
         }
@@ -30,6 +34,10 @@ export type Database = {
           from_name?: string
           id?: boolean
           reply_to?: string
+          smtp_host?: string
+          smtp_port?: number
+          smtp_secure?: boolean
+          smtp_username?: string
           test_recipient?: string
           updated_at?: string
         }
@@ -39,6 +47,10 @@ export type Database = {
           from_name?: string
           id?: boolean
           reply_to?: string
+          smtp_host?: string
+          smtp_port?: number
+          smtp_secure?: boolean
+          smtp_username?: string
           test_recipient?: string
           updated_at?: string
         }
