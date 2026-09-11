@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AppShell, SectionTitle } from "@/components/AppShell";
 import {
   DEFAULT_TEMPLATE,
+  EMPTY_SETTINGS,
   fetchSettings,
   saveSettings,
   type Settings,
