@@ -113,6 +113,47 @@ function SettingsPage() {
         </p>
       </section>
 
+      <SectionTitle title="Mail server" meta="your Namecheap mailbox" />
+      <section className="glass space-y-3 rounded-2xl p-4">
+        <Field
+          label="Server address"
+          value={form.smtp_host}
+          onChange={set("smtp_host")}
+          placeholder="mail.privateemail.com"
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field
+            label="Port"
+            value={String(form.smtp_port ?? "")}
+            onChange={(v) =>
+              setForm((prev) => ({ ...prev, smtp_port: Number(v.replace(/\D/g, "")) || 0 }))
+            }
+            placeholder="465"
+          />
+          <Field
+            label="Username"
+            value={form.smtp_username}
+            onChange={set("smtp_username")}
+            placeholder="dennis@callme-devshinobi.site"
+          />
+        </div>
+        <label className="flex items-center justify-between rounded-lg bg-panel-soft px-3 py-2.5 ring-1 ring-hairline">
+          <span className="text-[13px] text-foreground">Use SSL/TLS (port 465)</span>
+          <input
+            type="checkbox"
+            checked={form.smtp_secure}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, smtp_secure: e.target.checked }))
+            }
+            className="h-5 w-5 accent-brand"
+          />
+        </label>
+        <p className="font-mono text-[10px] leading-relaxed text-faint">
+          Turn SSL/TLS off only for port 587, which upgrades the connection after connecting. Your
+          mailbox password is stored separately and encrypted — it never appears on this screen.
+        </p>
+      </section>
+
       <SectionTitle title="Email format" meta="the AI follows this" />
       <section className="glass rounded-2xl p-4">
         <span className="label-mono">Your format &amp; instructions</span>
