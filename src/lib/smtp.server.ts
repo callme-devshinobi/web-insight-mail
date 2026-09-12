@@ -33,10 +33,12 @@ async function cloudflareConn(
     close: () => Promise<void>;
   };
 
-  let socket = mod.connect(
-    { hostname: host, port },
-    { secureTransport: implicitTls ? "on" : "starttls", allowHalfOpen: false },
-  ) as CfSocket;
+  // workerd is strict about the address argument — the "host:port" string form
+  // is the one it accepts everywhere.
+  let socket = mod.connect(`${host}:${port}`, {
+    secureTransport: implicitTls ? "on" : "starttls",
+    allowHalfOpen: false,
+  }) as CfSocket;
 
   let reader = socket.readable.getReader();
   let writer = socket.writable.getWriter();
