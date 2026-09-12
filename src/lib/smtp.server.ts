@@ -239,7 +239,20 @@ export type SmtpMessage = {
   text: string;
 };
 
-export async function smtpSend(config: SmtpConfig, msg: SmtpMessage): Promise<void> {
+/** Accepts things like "https://mail.example.com/webmail/" and returns "mail.example.com". */
+export function normalizeHost(input: string): string {
+  return (input || "")
+    .trim()
+    .replace(/^[a-z][a-z0-9+.-]*:\/\//i, "")
+    .replace(/^[^@]*@/, "")
+    .split("/")[0]!
+    .split(":")[0]!
+    .trim()
+    .toLowerCase();
+}
+
+export async function smtpSend(rawConfig: SmtpConfig, msg: SmtpMessage): Promise<void> {
+  const config: SmtpConfig = { ...rawConfig, host: normalizeHost(rawConfig.host) };
   if (!config.host) throw new Error("Set your mail server address in Settings first.");
   if (!config.username || !config.password) {
     throw new Error("Set your mailbox username and password before sending.");
