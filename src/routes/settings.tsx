@@ -77,8 +77,24 @@ function SettingsPage() {
   const set = (key: keyof Settings) => (value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
+  // "https://server242.web-hosting.com/webmail" -> "server242.web-hosting.com"
+  const cleanHost = (h: string) =>
+    (h || "")
+      .trim()
+      .replace(/^[a-z][a-z0-9+.-]*:\/\//i, "")
+      .replace(/^[^@]*@/, "")
+      .split("/")[0]!
+      .split(":")[0]!
+      .toLowerCase();
+
+  const cleaned = (): Settings => ({ ...form, smtp_host: cleanHost(form.smtp_host) });
+
   const save = useMutation({
-    mutationFn: () => saveSettings(form),
+    mutationFn: async () => {
+      const next = cleaned();
+      setForm(next);
+      return saveSettings(next);
+    },
     onSuccess: () => {
       toast.success("Settings saved");
       queryClient.invalidateQueries({ queryKey: ["settings"] });
@@ -88,7 +104,9 @@ function SettingsPage() {
 
   const test = useMutation({
     mutationFn: async () => {
-      await saveSettings(form);
+      const next = cleaned();
+      setForm(next);
+      await saveSettings(next);
       return runTest({ data: { to: form.test_recipient } });
     },
     onSuccess: (result) => {
