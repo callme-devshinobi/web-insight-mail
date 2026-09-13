@@ -46,6 +46,7 @@ function ReviewPage() {
     refetchInterval: 5000,
   });
   const [openId, setOpenId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "draft" | "sent" | "skipped">("all");
   const [drafts, setDrafts] = useState<Record<string, { subject: string; body: string }>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [bulk, setBulk] = useState<string | null>(null);
