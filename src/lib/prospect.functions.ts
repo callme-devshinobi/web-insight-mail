@@ -100,6 +100,18 @@ async function generateFor(
   }
 
   const settings = await loadSettings(client);
+
+  const { data: usedRows } = await client
+    .from("prospects")
+    .select("subject")
+    .neq("id", id)
+    .not("subject", "is", null)
+    .order("updated_at", { ascending: false })
+    .limit(15);
+  const avoidSubjects = (usedRows ?? [])
+    .map((r) => (r as { subject: string | null }).subject ?? "")
+    .filter(Boolean);
+
   const draft = await draftEmail({
     template: settings.email_template,
     company: row.company,
@@ -108,6 +120,7 @@ async function generateFor(
     issueNote: issue.note,
     fromName: settings.from_name,
     replyTo: settings.reply_to || settings.from_email,
+    avoidSubjects,
   });
 
   await client
