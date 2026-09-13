@@ -25,11 +25,17 @@ const SCHEMA = {
 } as const;
 
 function buildPrompt(input: DraftInput): string {
+  const avoid = (input.avoidSubjects ?? []).filter(Boolean).slice(0, 15);
   return [
     "You write short, natural cold outreach emails on behalf of one freelancer/agency owner.",
     "",
-    "THE SENDER'S OWN FORMAT AND INSTRUCTIONS (follow these closely):",
-    input.template.trim() || "(No format supplied — write a short, warm, 4-6 sentence plain-text email with a clear one-line ask.)",
+    "THE SENDER'S OWN FORMAT AND INSTRUCTIONS — THIS IS THE HIGHEST AUTHORITY.",
+    "Follow it exactly: its subject-line pattern, tone, ordering, length, paragraph structure and sign-off.",
+    "Where anything below conflicts with it, the sender's format wins.",
+    "---",
+    input.template.trim() ||
+      "(No format supplied — write a short, warm, 4-6 sentence plain-text email with a clear one-line ask.)",
+    "---",
     "",
     "PROSPECT:",
     `Company: ${input.company}`,
@@ -45,10 +51,22 @@ function buildPrompt(input: DraftInput): string {
     "- Plain text only. No markdown, no HTML, no placeholder brackets like [Name].",
     `- Sign off as ${input.fromName || "the sender"}.`,
     "- Do NOT add an unsubscribe line or a signature block with contact details; those are appended automatically.",
-    "- Subject line: lowercase-ish, specific, under 60 characters, no clickbait.",
     "",
+    "SUBJECT LINE:",
+    "- Follow the sender's subject pattern if their format specifies one.",
+    `- It must be unique to ${input.company} — reference something specific to this company or this issue.`,
+    "- Never reuse a phrasing you have used for another company; vary the wording, angle and rhythm every time.",
+    avoid.length
+      ? `- Subjects already used for other prospects (do NOT reuse or lightly reword any of these):\n${avoid.map((s) => `  • ${s}`).join("\n")}`
+      : "",
+    "",
+    `Variation seed (use it only to pick a fresh angle, never mention it): ${Math.random().toString(36).slice(2, 10)}`,
+    "",
+    "Write the complete email body — never truncate it, never end with an ellipsis.",
     "Return JSON with a 'subject' and a 'body'.",
-  ].join("\n");
+  ]
+    .filter((line) => line !== "")
+    .join("\n");
 }
 
 export async function draftEmail(input: DraftInput): Promise<Draft> {
