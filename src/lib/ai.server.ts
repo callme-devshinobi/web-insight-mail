@@ -9,6 +9,7 @@ export type DraftInput = {
   issueNote: string;
   fromName: string;
   replyTo: string;
+  avoidSubjects?: string[];
 };
 
 export type Draft = { subject: string; body: string };
