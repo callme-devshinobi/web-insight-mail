@@ -56,8 +56,28 @@ function ReviewPage() {
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["prospects"] });
 
-  const drafted = rows.filter((r) => r.subject);
+  const drafted = rows.filter((r) => r.email_status === "draft" || r.email_status === "approved");
+  const sentRows = rows.filter(
+    (r) => r.email_status === "sent" || r.email_status === "failed",
+  );
+  const skippedRows = rows.filter((r) => r.email_status === "skipped");
   const approved = rows.filter((r) => r.email_status === "approved");
+
+  const visible =
+    filter === "draft"
+      ? drafted
+      : filter === "sent"
+        ? sentRows
+        : filter === "skipped"
+          ? skippedRows
+          : rows;
+
+  const tabs = [
+    { key: "all" as const, label: "All", count: rows.length },
+    { key: "draft" as const, label: "Drafts", count: drafted.length },
+    { key: "sent" as const, label: "Sent", count: sentRows.length },
+    { key: "skipped" as const, label: "Skipped", count: skippedRows.length },
+  ];
 
   const editing = (row: Prospect) =>
     drafts[row.id] ?? { subject: row.subject ?? "", body: row.body ?? "" };
