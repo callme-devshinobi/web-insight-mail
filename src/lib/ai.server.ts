@@ -57,15 +57,15 @@ function buildPrompt(input: DraftInput): string {
     `- It must be unique to ${input.company} — reference something specific to this company or this issue.`,
     "- Never reuse a phrasing you have used for another company; vary the wording, angle and rhythm every time.",
     avoid.length
-      ? `- Subjects already used for other prospects (do NOT reuse or lightly reword any of these):\n${avoid.map((s) => `  • ${s}`).join("\n")}`
-      : "",
+      ? (`- Subjects already used for other prospects (do NOT reuse or lightly reword any of these):\n${avoid.map((s) => `  • ${s}`).join("\n")}` as string | null)
+      : null,
     "",
     `Variation seed (use it only to pick a fresh angle, never mention it): ${Math.random().toString(36).slice(2, 10)}`,
     "",
     "Write the complete email body — never truncate it, never end with an ellipsis.",
     "Return JSON with a 'subject' and a 'body'.",
   ]
-    .filter((line) => line !== "")
+    .filter((line): line is string => line !== null)
     .join("\n");
 }
 
