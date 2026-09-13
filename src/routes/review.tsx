@@ -165,16 +165,35 @@ function ReviewPage() {
         meta={`${drafted.length} draft${drafted.length === 1 ? "" : "s"} · ${approved.length} approved`}
       />
 
-      {rows.length === 0 ? (
+      <div className="mb-3 flex gap-1.5 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setFilter(tab.key)}
+            className={`shrink-0 rounded-lg px-3 py-2 font-mono text-[11px] ring-1 transition ${
+              filter === tab.key
+                ? "bg-brand/15 text-brand ring-brand/40"
+                : "bg-panel-soft text-muted-foreground ring-hairline"
+            }`}
+          >
+            {tab.label} ({tab.count})
+          </button>
+        ))}
+      </div>
+
+      {visible.length === 0 ? (
         <div className="glass-soft rounded-2xl p-6 text-center">
           <p className="text-[13px] text-muted-foreground">
-            Nothing here yet. Upload a CSV and run a scan first.
+            {rows.length === 0
+              ? "Nothing here yet. Upload a CSV and run a scan first."
+              : "Nothing in this list yet."}
           </p>
         </div>
       ) : null}
 
       <div className="space-y-3">
-        {rows.map((row) => {
+        {visible.map((row) => {
           const open = openId === row.id;
           const value = editing(row);
           const failed = row.checks?.filter((c) => !c.pass) ?? [];
