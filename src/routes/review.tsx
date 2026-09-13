@@ -46,6 +46,7 @@ function ReviewPage() {
     refetchInterval: 5000,
   });
   const [openId, setOpenId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "draft" | "sent" | "skipped">("all");
   const [drafts, setDrafts] = useState<Record<string, { subject: string; body: string }>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [bulk, setBulk] = useState<string | null>(null);
@@ -55,8 +56,28 @@ function ReviewPage() {
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["prospects"] });
 
-  const drafted = rows.filter((r) => r.subject);
+  const drafted = rows.filter((r) => r.email_status === "draft" || r.email_status === "approved");
+  const sentRows = rows.filter(
+    (r) => r.email_status === "sent" || r.email_status === "failed",
+  );
+  const skippedRows = rows.filter((r) => r.email_status === "skipped");
   const approved = rows.filter((r) => r.email_status === "approved");
+
+  const visible =
+    filter === "draft"
+      ? drafted
+      : filter === "sent"
+        ? sentRows
+        : filter === "skipped"
+          ? skippedRows
+          : rows;
+
+  const tabs = [
+    { key: "all" as const, label: "All", count: rows.length },
+    { key: "draft" as const, label: "Drafts", count: drafted.length },
+    { key: "sent" as const, label: "Sent", count: sentRows.length },
+    { key: "skipped" as const, label: "Skipped", count: skippedRows.length },
+  ];
 
   const editing = (row: Prospect) =>
     drafts[row.id] ?? { subject: row.subject ?? "", body: row.body ?? "" };
@@ -144,16 +165,35 @@ function ReviewPage() {
         meta={`${drafted.length} draft${drafted.length === 1 ? "" : "s"} · ${approved.length} approved`}
       />
 
-      {rows.length === 0 ? (
+      <div className="mb-3 flex gap-1.5 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setFilter(tab.key)}
+            className={`shrink-0 rounded-lg px-3 py-2 font-mono text-[11px] ring-1 transition ${
+              filter === tab.key
+                ? "bg-brand/15 text-brand ring-brand/40"
+                : "bg-panel-soft text-muted-foreground ring-hairline"
+            }`}
+          >
+            {tab.label} ({tab.count})
+          </button>
+        ))}
+      </div>
+
+      {visible.length === 0 ? (
         <div className="glass-soft rounded-2xl p-6 text-center">
           <p className="text-[13px] text-muted-foreground">
-            Nothing here yet. Upload a CSV and run a scan first.
+            {rows.length === 0
+              ? "Nothing here yet. Upload a CSV and run a scan first."
+              : "Nothing in this list yet."}
           </p>
         </div>
       ) : null}
 
       <div className="space-y-3">
-        {rows.map((row) => {
+        {visible.map((row) => {
           const open = openId === row.id;
           const value = editing(row);
           const failed = row.checks?.filter((c) => !c.pass) ?? [];
@@ -253,9 +293,16 @@ function ReviewPage() {
                           {row.subject}
                         </p>
                       </div>
-                      <p className="mt-2 line-clamp-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                      <p className="mt-2 whitespace-pre-wrap text-[12.5px] leading-relaxed text-muted-foreground">
                         {row.body}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => setOpenId(row.id)}
+                        className="mt-2 font-mono text-[10px] text-brand underline underline-offset-2"
+                      >
+                        Edit this email
+                      </button>
                     </>
                   )}
 
