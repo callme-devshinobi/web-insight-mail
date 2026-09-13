@@ -293,9 +293,16 @@ function ReviewPage() {
                           {row.subject}
                         </p>
                       </div>
-                      <p className="mt-2 line-clamp-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                      <p className="mt-2 whitespace-pre-wrap text-[12.5px] leading-relaxed text-muted-foreground">
                         {row.body}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => setOpenId(row.id)}
+                        className="mt-2 font-mono text-[10px] text-brand underline underline-offset-2"
+                      >
+                        Edit this email
+                      </button>
                     </>
                   )}
 
